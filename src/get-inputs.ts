@@ -36,7 +36,8 @@ export function getInputs(): Inputs {
   let useBuiltinJekyll = false;
 
   const isBoolean = (param: string): boolean => (param || 'false').toUpperCase() === 'TRUE';
-
+  const isBool = (param: string): boolean =>
+    ['true', 'True', 'TRUE', 'false', 'False', 'FALSE'].includes(param);
   const enableJekyll: boolean = isBoolean(core.getInput('enable_jekyll'));
   const disableNoJekyll: boolean = isBoolean(core.getInput('disable_nojekyll'));
 
@@ -57,7 +58,9 @@ export function getInputs(): Inputs {
     DestinationDir: core.getInput('destination_dir'),
     ExternalRepository: core.getInput('external_repository'),
     AllowEmptyCommit: isBoolean(core.getInput('allow_empty_commit')),
-    KeepFiles: isBoolean(core.getInput('keep_files')),
+    KeepFiles: isBool(core.getInput('keep_files'))
+      ? core.getBooleanInput('keep_files')
+      : core.getMultilineInput('keep_files'),
     ForceOrphan: isBoolean(core.getInput('force_orphan')),
     UserName: core.getInput('user_name'),
     UserEmail: core.getInput('user_email'),

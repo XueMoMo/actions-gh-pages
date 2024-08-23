@@ -111,13 +111,15 @@ export async function setRepo(inps: Inputs, remoteURL: string, workDir: string):
     if (result.exitcode === 0) {
       await createDir(destDir);
 
-      if (inps.KeepFiles) {
+      if (inps.KeepFiles == true) {
         core.info('[INFO] Keep existing files');
       } else {
+        const keeps = typeof inps.KeepFiles !== 'boolean' ? (inps.KeepFiles as string[]) : [];
+        const keepsMatch = keeps.map(item => `:!${item}`);
         core.info(`[INFO] clean up ${destDir}`);
         core.info(`[INFO] chdir ${destDir}`);
         process.chdir(destDir);
-        await exec.exec('git', ['rm', '-r', '--ignore-unmatch', '*']);
+        await exec.exec('git', ['rm', '-r', '--ignore-unmatch', '*', ...keepsMatch]);
       }
 
       core.info(`[INFO] chdir ${workDir}`);
